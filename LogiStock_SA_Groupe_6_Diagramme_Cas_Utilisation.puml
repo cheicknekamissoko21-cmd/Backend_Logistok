@@ -1,0 +1,124 @@
+﻿@startuml
+title Diagramme de cas d'utilisation — LogiStock SA (Groupe 6)
+left to right direction
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+skinparam actorStyle stickman
+skinparam nodesep 35
+skinparam ranksep 45
+skinparam ArrowColor #34495E
+skinparam usecase {
+  BackgroundColor #EAF2F8
+  BorderColor #245B7A
+  FontColor #1B2631
+}
+
+actor "Visiteur" as Visitor
+actor "Administrateur" as Admin
+actor "Gestionnaire de stock" as StockManager
+actor "Commercial" as Sales
+
+rectangle "Système LogiStock SA" {
+  package "Authentification" {
+    usecase "S'inscrire" as Register
+    usecase "S'authentifier" as Login
+    usecase "Gérer son profil" as Profile
+  }
+  package "Administration" {
+    usecase "Gérer les utilisateurs" as Users
+    usecase "Attribuer les rôles" as Roles
+  }
+  package "Gestion des stocks" {
+    usecase "Gérer les produits" as Products
+    usecase "Gérer les catégories" as Categories
+    usecase "Enregistrer un mouvement de stock" as Movement
+    usecase "Consulter l'historique des mouvements" as History
+    usecase "Consulter les alertes de stock" as Alerts
+  }
+  package "Clients et commandes" {
+    usecase "Gérer les clients" as Clients
+    usecase "Créer une commande" as CreateOrder
+    usecase "Consulter les commandes" as ViewOrders
+    usecase "Valider une commande" as ValidateOrder
+    usecase "Annuler une commande" as CancelOrder
+    usecase "Vérifier la disponibilité du stock" as CheckStock
+  }
+  package "Facturation" {
+    usecase "Générer une facture PDF" as GenerateInvoice
+    usecase "Consulter les factures" as ViewInvoices
+  }
+  package "Pilotage et statistiques" {
+    usecase "Consulter le tableau de bord" as Dashboard
+    usecase "Consulter les statistiques de vente" as SalesStats
+  }
+}
+
+Visitor -- Register
+Visitor -- Login
+
+Admin -- Login
+Admin -- Profile
+Admin -- Users
+Admin -- Roles
+Admin -- Products
+Admin -- Categories
+Admin -- Movement
+Admin -- History
+Admin -- Alerts
+Admin -- Clients
+Admin -- CreateOrder
+Admin -- ViewOrders
+Admin -- ValidateOrder
+Admin -- CancelOrder
+Admin -- GenerateInvoice
+Admin -- ViewInvoices
+Admin -- Dashboard
+Admin -- SalesStats
+
+StockManager -- Login
+StockManager -- Profile
+StockManager -- Products
+StockManager -- Categories
+StockManager -- Movement
+StockManager -- History
+StockManager -- Alerts
+
+Sales -- Login
+Sales -- Profile
+Sales -- Clients
+Sales -- CreateOrder
+Sales -- ViewOrders
+Sales -- ValidateOrder
+Sales -- CancelOrder
+Sales -- GenerateInvoice
+Sales -- ViewInvoices
+Sales -- Dashboard
+Sales -- SalesStats
+
+ValidateOrder ..> CheckStock : <<include>>
+
+note right of GenerateInvoice
+  Précondition :
+  la commande doit être validée.
+  Une seule facture par commande.
+end note
+
+note bottom of Login
+  Les fonctionnalités protégées nécessitent
+  une authentification préalable.
+  Les permissions sont vérifiées côté serveur.
+end note
+
+note bottom of ValidateOrder
+  Si le stock est insuffisant,
+  la validation est refusée.
+  La mise à jour commande/stock est atomique.
+end note
+
+@enduml
+
+
